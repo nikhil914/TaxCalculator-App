@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Tax Calculator</string>
+    <string name="button1">Calculate Income Tax</string>
+    <string name="button3">Amount</string>
+    <string name="button2">GST Calculate</string>
+    <string name="textview">Input Income</string>
+</resources>
