@@ -1,18 +1,18 @@
 package index1.developer.nik.com.taxcalculator;
 
-import android.content.DialogInterface;
+
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.view.*;
+import android.widget.*;
+import android.content.Intent;
+import android.content.IntentFilter;
 
 import java.util.ArrayList;
 
@@ -20,12 +20,16 @@ import index1.developer.niklocal.com.taxcalculator.R;
 
 public class GST extends AppCompatActivity {
 
-    DatabaseHelper db;
-    AlertDialog.Builder b;
-    AlertDialog a;
     ListView lv;
     EditText ed;
+
     TextView tx1;
+    AlertDialog.Builder alert;
+
+    DatabaseHelper db;
+
+    AlertDialog dialog;
+
     ArrayList<String> il;
     ArrayList<String> tlist;
     static int position;
@@ -37,8 +41,9 @@ public class GST extends AppCompatActivity {
 
         lv = (ListView) findViewById(R.id.listview);
         tx1=(TextView)findViewById(R.id.textview2);
-        b = new AlertDialog.Builder(this);
-        fetchall();
+        alert = new AlertDialog.Builder(this);
+        getid();
+        oncreateShow();
 
         lv.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, il));
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -46,53 +51,56 @@ public class GST extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 position = i;
                 ed = new EditText(GST.this);
-                b.setTitle("Enter Amount");
-                b.setMessage("Amount of " + il.get(i) + "\t");
-                b.setView(ed);
-                b.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                alert.setTitle("Enter Amount");
+                alert.setMessage("Amount of " + il.get(i) + "\t");
+                alert.setView(ed);
+                alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                                calculate();
+                                function();
+                                show();
 
                     }
                 });
-                b.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        calculate();
+                        function();
+                        show();
 
                     }
                 });
-                a = b.create();
-                a.show();
+                dialog = alert.create();
+                dialog.show();
             }
         });
     }
-
-    public void calculate() {
-        int am = 0;
-        float t;
-        String val = lv.getItemAtPosition(position).toString();;
-        int total = 0, tax = 0;
-        if (!TextUtils.isEmpty(ed.getText().toString())) {
-            am = Integer.parseInt(ed.getText().toString());
-            if (val.equals(il.get(position))) {
-                t=Float.parseFloat(tlist.get(position));
-                tax = (int) ((am * t) / 100);
-                total = am + tax;
-                tx1.setText("Amount of "+val+" ="+am+"\n"+
-                            "Tax% ="+t+"\n"+
-                            "GST Calculated =" + tax + "\n" +
-                            "Total Amount (Inclusion of GST) =" + total + "\t");
-            }
-        } else {
-            tx1.setText("Amount of "+val+" ="+am+"\n"+
-                            "Tax =" + tax + "\n" +
-                        "Total amount =" + total);
-        }
+/*
+    @Override
+    public boolean releaseInstance() {
+        return super.releaseInstance();
     }
+*/
+/*
+    @Override
+    public Intent registerReceiver(BroadcastReceiver receiver, IntentFilter filter, int flags) {
+        return super.registerReceiver(receiver, filter, flags);
+    }
+*/
+/*
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+    }
+*/
+public void Display(){
+    String a=getCallingPackage();
+    Toast.makeText(GST.this,"Display",Toast.LENGTH_SHORT).show();
 
-    public void fetchall() {
+}
+
+
+    public void getid() {
         db = new DatabaseHelper(this);
         try {
 
@@ -118,5 +126,37 @@ public class GST extends AppCompatActivity {
         }
         cursor.close();
     }
-}
+    public void show(){
+        Toast.makeText(GST.this,"Show",Toast.LENGTH_SHORT).show();
+    }
+
+
+    public void oncreateShow(){
+        Toast.makeText(GST.this,"start",Toast.LENGTH_SHORT).show();
+    }
+
+    public void function() {
+        int am = 0;
+        float t;
+        String val = lv.getItemAtPosition(position).toString();;
+        int total = 0, tax = 0;
+        if (!TextUtils.isEmpty(ed.getText().toString())) {
+            am = Integer.parseInt(ed.getText().toString());
+            if (val.equals(il.get(position))) {
+                t=Float.parseFloat(tlist.get(position));
+                tax = (int) ((am * t) / 100);
+                total = am + tax;
+                tx1.setText("Amount of "+val+" ="+am+"\n"+
+                            "Tax% ="+t+"\n"+
+                            "GST Calculated =" + tax + "\n" +
+                            "Total Amount (Inclusion of GST) =" + total + "\t");
+            }
+        } else {
+            tx1.setText("Amount of "+val+" ="+am+"\n"+
+                            "Tax =" + tax + "\n" +
+                        "Total amount =" + total);
+        }
+    }
+
+   }
 

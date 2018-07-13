@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "index1.developer.acadview.com.taxcalculator"
+        applicationId "index1.nik.com.taxcalculator"
         minSdkVersion 18
         targetSdkVersion 26
         versionCode 1

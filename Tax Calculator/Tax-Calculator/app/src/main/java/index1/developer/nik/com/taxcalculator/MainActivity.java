@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import index1.developer.niklocal.com.taxcalculator.R;
 
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent in= new Intent(MainActivity.this,Income.class);
                 startActivity(in);
+                clickevent();
             }
         });
 
@@ -34,8 +36,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent=new Intent(MainActivity.this, GST.class);
                 startActivity(intent);
+                clickevent();
 
             }
         });
+    }
+    public void clickevent(){
+        Toast.makeText(MainActivity.this,"Click ",Toast.LENGTH_SHORT).show();
     }
 }

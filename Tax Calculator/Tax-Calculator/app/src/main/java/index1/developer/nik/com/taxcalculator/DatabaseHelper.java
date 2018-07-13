@@ -5,11 +5,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import java.io.*;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 
 
@@ -17,18 +14,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static String DB_PATH = "";
     private static String DB_NAME ="GST.db";
-    private SQLiteDatabase mDataBase;
-    private final Context mContext;
+    private SQLiteDatabase database;
+    private final Context cotxt;
+
+/*
+    @Override
+    public SQLiteDatabase getReadableDatabase() {
+        return super.getReadableDatabase();
+    }
+*/
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, 1);
 
-        this.mContext = context;
-        DB_PATH = mContext.getDatabasePath(DB_NAME).toString();
+        this.cotxt = context;
+        DB_PATH = cotxt.getDatabasePath(DB_NAME).toString();
     }
+/*
+    @Override
+    public void onConfigure(SQLiteDatabase db) {
+        super.onConfigure(db);
+    }
+*/
 
+// checking if database is already exists
     public void createDatabase () throws IOException {
 
-        boolean dbExist = checkDataBase();
+        boolean dbExist = olddb();
 
         if(dbExist){
 
@@ -40,22 +51,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             try {
 
-                copyDataBase();
+                cloneA();
 
             }
             catch (IOException e) {
 
                 throw new Error("Error copying database");
-
             }
 
         }
 
     }
+/*
+    public void setDatabase(SQLiteDatabase database) {
+        this.database = database;
+                    Log.i("SQLite Error", "db error.");
 
-
-
-    private boolean checkDataBase(){
+    }
+*/
+    private boolean olddb(){
 
         SQLiteDatabase checkDB = null;
 
@@ -64,7 +78,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
 
         }catch(SQLException e){
-            Log.i("SQLite Error", "database does't exist yet.");
+            Log.i("SQLite Error", "No database found.");
 
         }
 
@@ -78,22 +92,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    private void copyDataBase() throws IOException{
+    private void cloneA() throws IOException{
 
-        InputStream myInput = mContext.getAssets().open(DB_NAME);
+        InputStream myInput = cotxt.getAssets().open(DB_NAME);
 
         String outFileName = DB_PATH;
 
-        OutputStream myOutput = new FileOutputStream(outFileName);
+        OutputStream os = new FileOutputStream(outFileName);
 
         byte[] buffer = new byte[1024];
         int length;
         while ((length = myInput.read(buffer))>0){
-            myOutput.write(buffer, 0, length);
+            os.write(buffer, 0, length);
         }
 
-        myOutput.flush();
-        myOutput.close();
+        os.flush();
+        os.close();
         myInput.close();
 
     }
@@ -101,19 +115,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void openDataBase() throws SQLException
     {
         String myPath = DB_PATH;
-        mDataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+        database = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
 
     }
 
     @Override
     public synchronized void close()
     {
-        if(mDataBase != null)
-            mDataBase.close();
+        if(database != null)
+            database.close();
 
         super.close();
 
     }
+    public  void onDestroy()
+    {
+        Log.i("SQLite Error", "Destroy method.");
+        
+    }    
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
@@ -123,7 +142,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         if(newVersion>oldVersion)
             try {
-                copyDataBase();
+                cloneA();
             } catch (IOException e) {
                 e.printStackTrace();
             }
